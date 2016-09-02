@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	    <script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script>
+var host="bos-as-krishnan";
+var port="8081";
+var subscriptionEndpoint = "/arch";
+
+        $(function(){
+            $("#includedView").load("View.html");
+        });
+        function saveNode()
+        {
+
+            $.ajax({
+                type: "POST",
+                url: "http://"+host+":"+port+"/nodes",
+                data: '{"name":"'+document.getElementById("nodeName").value+'","type":"'+document.getElementById("nodeType").value+'"}',
+                dataType: "json",
+                contentType: 'application/json; charset=UTF-8',
+
+                success: function() {
+				alert("Successfully Added");
+                  loadNodes();
+                },
+                statusCode: {
+                    409: function () {
+                        alert('Node already exists');
+                    },
+
+                    400: function () {
+                        alert('bad request');
+                    }
+                }
+            });
+
+
+        }
+
+        function saveLink()
+        {
+            var e = document.getElementById("selectSourceNode");
+            var sourceNode = e.options[e.selectedIndex].text;
+            e = document.getElementById("targetSourceNode");
+            var targetNode = e.options[e.selectedIndex].text;
+            e = document.getElementById("protocol");
+            var protocol = e.options[e.selectedIndex].text;
+            if(sourceNode == targetNode)
+                    alert("Source and Target cannot be the same");
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: "http://"+host+":"+port+"/links",
+                    data: '{"source":"' + sourceNode + '","target":"' + targetNode + '","value":"' + 1 + '","protocol":"' + protocol + '"}',
+                    dataType: "json",
+                    contentType: 'application/json; charset=UTF-8',
+
+                    success: function () {
+                       alert("Successfully Added");
+					   $("#includedView").load("View.html");
+                    },
+                    statusCode: {
+                        409: function () {
+                            alert('Link already exists');
+                        },
+
+                        400: function () {
+                            alert('bad request');
+                        }
+                    }
+                });
+            }
+
+        }
+		function loadNodes()
+        {
+			
+			
+			$(document).ready(function(){
+				$.ajax({
+					headers: { 'Access-Control-Allow-Origin': '*' },
+					crossDomain: true,
+					url: "http://"+host+":"+port+"/nodes"
+				}).then(function(data) {
+					
+					var html="";
+					var type="";
+					
+					$.each(data._embedded.nodes, function (key, value) {
+						
+						addNodeOptions(value);
+					});
+					
+					
+				});
+				});
+		}
+		
+		function addNodeOptions(value)
+		{
+						console.log('Adding node: ' + value.name+": "+value.type);
+						addSelectOption("selectSourceNode", value.name);
+						addSelectOption("targetSourceNode", value.name);
+
+						if(!containsOption('#nodeType option', value.type))
+						{
+							addSelectOption("nodeType", value.type);
+						}
+		}
+		
+		function deleteNodeOptions(value)
+		{
+						console.log('Deleting node: ' + value.name+": "+value.type);
+						deleteSelectOption("selectSourceNode", value.name);
+						deleteSelectOption("targetSourceNode", value.name);
+
+		}
+		
+		function containsOption(element, value)
+		{
+					var exists = false;
+			$(element).each(function(){
+				
+				if (this.value == value) {
+					exists = true;
+					
+				}
+			});
+			return exists;
+		}
+		
+		function addSelectOption(elementName, value)
+		{
+			var element = document.getElementById(elementName);
+			var node = document.createElement('option');
+			node.value = value;
+			node.text = value;
+			element.appendChild(node);
+		}
+		
+		function deleteSelectOption(elementName, value)
+		{
+			var element = document.getElementById(elementName);
+			var node = document.createElement('option');
+			for (var i=0; i<element.length; i++){
+				if (element.options[i].value == value )
+				element.remove(i);
+			}
+		}
+		
+		function loadProtocol()
+		{
+			$(document).ready(function(){
+				$.ajax({
+					headers: { 'Access-Control-Allow-Origin': '*' },
+					crossDomain: true,
+					url: "http://"+host+":"+port+"/links"
+				}).then(function(data) {
+				
+					var html="";
+					var protocols=[];
+					$.each(data._embedded.links, function (key, value) {
+						if(!containsOption('#protocol option', value.protocol))
+						 {
+							addSelectOption("protocol", value.protocol);
+						}
+					});
+				
+				});
+			});
+		}
+		
+		
+			
+		
+		function subscripeToTopic(topic, action) {
+		
+		var socket = new SockJS("http://"+host+":"+port+"/"+subscriptionEndpoint);
+			var stompClient = Stomp.over(socket);
+			console.log('Connecting to topic: '+topic);
+				stompClient.connect({}, function (frame) {
+					
+					console.log('Connected: ' + frame);
+					stompClient.subscribe(topic, function (greeting) {
+					
+					console.log(greeting.body);
+					switch(action)
+					{
+						case 'add': addNodeOptions(JSON.parse(greeting.body));
+									break;
+						case 'delete': deleteNodeOptions(JSON.parse(greeting.body));
+									break;
+					}
+					});
+				});
+		}
+		
+		
+		loadNodes();
+		loadProtocol();
+
+		subscripeToTopic('/topic/arch/nodedelete', 'delete');
+		subscripeToTopic('/topic/arch/nodesave', 'add');
+		
+    </script>
+</head>
+<body>
+<H3>Admin</H3>
+<table border="1">
+    <tr><td><h3>Add Product</h3></td></tr>
+    <tr>
+        <td bgcolor="#7fffd4">Product Name:</td><br>
+        <td bgcolor="#7fffd4">Product Type:</td></tr>
+    <tr>
+        <td>
+                <input type="text" name="name" id="nodeName"></td>
+        <td>
+                <select type="text" name="type" id="nodeType"/><br></td>
+        <td>
+                <button onclick="saveNode()">Add Product</button>
+        </td>
+    </tr>
+
+    <tr><td><h3>Add Link</h3></td></tr>
+    <tr>
+        <td bgcolor="#7fffd4">Source Product:</td><br>
+        <td bgcolor="#7fffd4">Target Product:</td>
+        <td bgcolor="#7fffd4">Protocol:</td></tr>
+    <tr>
+        <td>
+            <select type="text" name="name" id="selectSourceNode"/></td>
+        <td>
+        <select type="text" name="name" id="targetSourceNode"/></td>
+
+        <td>
+            <select type="text" name="name" id="protocol"/><br></td>
+        <td>
+            <button onclick="saveLink()">Add Link</button>
+        </td>
+    </tr>
+	
+
+</table>
+<div id="includedView"></div>
+
+</body>
+</html>

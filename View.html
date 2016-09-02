@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<meta content="utf-8" http-equiv="encoding">
+<title>View</title>
+<style>
+
+@import url(http://bost.ocks.org/mike/style.css?20120521);
+
+#chart {
+  height: 1000px;
+}
+
+.node rect {
+  cursor: move;
+  fill-opacity: .9;
+  shape-rendering: crispEdges;
+}
+
+.node text {
+  pointer-events: none;
+  text-shadow: 0 1px 0 #fff;
+}
+
+.link {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .02;
+}
+
+div  {
+    float: left;
+}
+
+/*.link:hover {*/
+  /*stroke-opacity: .9 !important;*/
+/*}*/
+/*.inlineTable {*/
+    /*display: inline-block;*/
+/*}*/
+
+</style>
+<head>
+ <script src="d3.v3.min.js" charset="utf-8"></script>
+
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="sankey.js"></script>
+</head>
+<body>
+
+<h3>REALSuite Architecture</h3>
+    <div>
+        <p id="chart">
+    </div>
+
+
+    <div>
+        <table id="systemlegend"/>
+        <br/>
+    </div>
+
+    <div>
+        <table id="connectionlegend"/>
+    </div>
+
+</table>
+
+<script>
+var host="bos-as-krishnan";
+var port="8081";
+var margin = {top: 1, right: 200, bottom: 200, left: 1},
+    width = 1600 - margin.left - margin.right,
+    height = 1200 - margin.top - margin.bottom;
+
+var formatNumber = d3.format(",.0f"),
+    format = function(d) { return formatNumber(d) + " TWh"; },
+    color = d3.scale.category20();
+
+var svg = d3.select("#chart").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var sankey = d3.sankey()
+    .nodeWidth(15)
+    .nodePadding(10)
+    .size([width, height]);
+
+var path = sankey.link();
+//var energyjson = '{"nodes":[{"name":"CMS/ CMS 6.x"},{"name":"ACB"},{"name":"ASPECT / Dialer"},{"name":"OcwenCustomers.com"},{"name":"iCasework"},{"name":"ACH"},{"name":"REO"},{"name":"Real Resolution Foreclosure"},{"name":"Real Resolution Bankruptcy"},{"name":"VMS"},{"name":"Equator"},{"name":"ESB"},{"name":"REALServicing"},{"name":"CWQ"},{"name":"WebSpeed"},{"name":"STAGE 5"},{"name":"TR DB"},{"name":"ARLT"},{"name":"Data Warehouse: ODS, DWFL, Letter DB"},{"name":"MS Dynamics Accounting"},{"name":"LRM"},{"name":"REAL Investor Portal"},{"name":"REALDoc"},{"name":"RDNG"},{"name":"CIS/Vault"},{"name":"Bing Map(Mapping Services)"},{"name":"SpeedPay Payment System"},{"name":"Allison"},{"name":"Pacer/Banko"},{"name":"ORCC"},{"name":"Vecta Ventura"},{"name":"HOV"},{"name":"Waltz"},{"name":"CRNG"},{"name":"TransCentra"},{"name":"Hubzu"},  {"name":"REALRemit"},  {"name":"REALTrans"},  {"name":"REALTrans NG"},  {"name":"Doc Automation/ Loss Mitigation"},  {"name":"REALResolution"}],"links":[  {"source":0,"target":20,"value":1},  {"source":0,"target":12,"value":1},  {"source":0,"target":14,"value":1},  {"source":1,"target":12,"value":1},  {"source":2,"target":1,"value":1},  {"source":3,"target":1,"value":1},  {"source":3,"target":27,"value":1},  {"source":3,"target":29,"value":1},  {"source":3,"target":26,"value":1},  {"source":3,"target":5,"value":1},  {"source":4,"target":5,"value":1},  {"source":5,"target":15,"value":1},  {"source":5,"target":18,"value":1},  {"source":6,"target":18,"value":1},  {"source":6,"target":13,"value":1},  {"source":6,"target":23,"value":1},  {"source":6,"target":24,"value":1},  {"source":7,"target":17,"value":1},  {"source":7,"target":36,"value":1},  {"source":7,"target":23,"value":1},  {"source":7,"target":39,"value":1},  {"source":7,"target":12,"value":1},  {"source":7,"target":11,"value":1},  {"source":7,"target":36 ,"value":1},  {"source":8,"target":14,"value":1},  {"source":9,"target":6,"value":1},  {"source":9,"target":12,"value":1},  {"source":10,"target":11,"value":1},  {"source":10,"target":12,"value":1},  {"source":10,"target":38,"value":1},  {"source":11,"target":14,"value":1},  {"source":11,"target":36,"value":1},  {"source":11,"target":24,"value":1},  {"source":12,"target":34,"value":1},  {"source":12,"target":27,"value":1},  {"source":12,"target":15,"value":1},  {"source":12,"target":16,"value":1},  {"source":12,"target":37,"value":1},  {"source":12,"target":38,"value":1},  {"source":14,"target":23,"value":1},  {"source":14,"target":37,"value":1},  {"source":14,"target":38,"value":1},  {"source":15,"target":20,"value":1},  {"source":15,"target":18,"value":1},  {"source":15,"target":36,"value":1},  {"source":15,"target":23,"value":1},  {"source":16,"target":39,"value":1},  {"source":16,"target":17,"value":1},  {"source":16,"target":20,"value":1},  {"source":16,"target":22,"value":1},  {"source":16,"target":17,"value":1},  {"source":17,"target":39,"value":1},  {"source":17,"target":18,"value":1},  {"source":17,"target":20,"value":1},  {"source":17,"target":33,"value":1},  {"source":17,"target":40,"value":1},  {"source":17,"target":36,"value":1},  {"source":18,"target":23,"value":1},  {"source":18,"target":20,"value":1},  {"source":19,"target":36,"value":1},  {"source":20,"target":24,"value":1},  {"source":22,"target":40,"value":1},  {"source":22,"target":35,"value":1},  {"source":22,"target":31,"value":1},  {"source":22,"target":32,"value":1},  {"source":22,"target":33,"value":1},  {"source":22,"target":34,"value":1},  {"source":23,"target":38,"value":1},  {"source":23,"target":27,"value":1},  {"source":24,"target":36,"value":1},  {"source":24,"target":39,"value":1},  {"source":37,"target":25,"value":1},  {"source":38,"target":35,"value":1}]}';
+//var root = JSON.parse( energyjson );
+//update(root);
+$(document).ready(function(){
+$.ajax({
+    headers: { 'Access-Control-Allow-Origin': '*' },
+    crossDomain: true,
+    url: "http://"+host+":"+port+"/getArchitecture"
+}).then(function(data) {
+    var root = JSON.parse( data );
+    update(root);
+    function update(arch) {
+
+
+        var uniqueTypes = d3.nest()
+                .key(function(d) { return d.type; })
+                .entries(arch.nodes);
+
+
+        var uniqueLinks = d3.nest()
+                .key(function(d) { return d.protocol; })
+                .entries(arch.links);
+
+        buildTable(d3.select("#systemlegend"), uniqueTypes, "left", "SYSTEM LEGEND");
+        buildTable(d3.select("#connectionlegend"), uniqueLinks, "right", "CONNECTION LEGEND");
+        sankey
+                .nodes(arch.nodes)
+                .links(arch.links)
+                .layout(32);
+
+        var link = svg.append("g").selectAll(".link")
+                .data(arch.links)
+                .enter().append("path")
+                .attr("class", "link")
+                .attr("d", path)
+                .attr("id", function(d,i){
+                    d.id = i;
+                    return "link-"+i;
+                })
+                .attr("value", function(d){
+                    d.value = d.protocol;
+                    return d.protocol;
+                })
+                .style("stroke-width", function(d) { return Math.min(4, d.dy); })
+                .sort(function(a, b) { return b.dy - a.dy; })
+				.on("contextmenu",confirmDeleteLink);
+
+        link.append("title")
+
+                .text(function(d) { return d.source.name + " → " + d.target.name + "\n" + d.protocol; });
+
+        var node = svg.append("g").selectAll(".node")
+                .data(arch.nodes)
+                .enter().append("g")
+                .attr("class", "node")
+                .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+                .call(d3.behavior.drag()
+                        .origin(function(d) { return d; })
+                        .on("dragstart", function() { this.parentNode.appendChild(this); })
+                        .on("drag", dragmove))
+                .on("click",highlight_paths)
+				.on("contextmenu",confirmDeleteNode);
+
+        node.append("rect")
+                .attr("height", function(d) { return d.dy; })
+                .attr("width", sankey.nodeWidth())
+                .style("fill", function(d) { return d.color = color(d.type.replace(/ .*/, "")); })
+                .style("stroke", function(d) { return d3.rgb(d.color).darker(2); })
+                .append("title")
+                .text(function(d) { return d.name + ":" + d.type; });
+
+        node.append("text")
+                .attr("x", -6)
+                .attr("y", function(d) { return d.dy / 2; })
+                .attr("dy", ".35em")
+                .attr("text-anchor", "end")
+                .attr("transform", null)
+                .text(function(d) { return d.name; })
+                .filter(function(d) { return d.x < width / 2; })
+                .attr("x", 6 + sankey.nodeWidth())
+                .attr("text-anchor", "start");
+
+        function dragmove(d) {
+            d3.select(this).attr("transform",
+                    "translate(" + (
+                            d.x = Math.max(0, Math.min(width - d.dx, d3.event.x))
+                    )
+                    + "," + (
+                            d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))
+                    ) + ")");
+            sankey.relayout();
+            link.attr("d", path);}
+
+        function highlight_paths(d,i) {
+            if( d3.select(this).attr("data-clicked") == "1" ){
+                d3.select(this).attr("data-clicked","0");
+                highlight_link(d, 0.02, "#000");
+            }else{
+                d3.select(this).attr("data-clicked","1");
+                highlight_link(d, 0.9, function(d)
+                { return d3.rgb(d.color = color(d.value.replace(/ .*/, ""))); });
+            }
+        }
+
+        function highlight_link(d, opacity, stroke){
+            d.sourceLinks.forEach(function(srcLnk){
+
+                d3.select("#link-"+srcLnk.id).style("stroke", stroke);
+                d3.select("#link-"+srcLnk.id).style("stroke-opacity", opacity)
+
+            });
+            d.targetLinks.forEach(function(srcLnk){
+                d3.select("#link-"+srcLnk.id).style("stroke", stroke);
+                d3.select("#link-"+srcLnk.id).style("stroke-opacity", opacity);
+
+            });
+        }
+		
+		
+
+        function buildTable(table, keys, align, legend){
+
+            //var table = d3.select('body').append('table');
+            //table.style("float", align);
+            var caption = table.append('caption');
+            caption.html(legend);
+            caption.style("border", "solid")
+            var tr = table.selectAll('tr')
+                    .data(keys).enter()
+                    .append('tr');
+
+            tr.append('td').html(function(m) { return m.key; });
+            tr.append('td').html(function(m) {}).style("background-color", function(d){return d3.rgb(color(d.key.replace(/ .*/, ""))); }).attr("width", 30);
+            table.append('tr');
+            table.append('tr');
+            table.append('tr');
+            table.append('tr');
+        }
+		
+		
+        function confirmDeleteLink(d){
+			d3.event.preventDefault();
+        
+		   var answer = confirm ("Delete this link?")
+			if (answer)
+			{
+				var url = "http://"+host+":"+port+"/deleteBySourceAndTargetAndProtocol?source="+d.source.name+"&target="+d.target.name+"&protocol="+d.protocol;
+				deleteEntity (url, d.source.name+" link with "+d.target.name+" through"+d.protocol);
+				
+			}
+			else
+				alert ("Back to the drawing board!")
+			
+        }
+		
+			
+		function confirmDeleteNode(d){
+			d3.event.preventDefault();
+        
+		   var answer = confirm ("Delete this node?")
+			if (answer)
+			{
+				deleteEntity ("http://"+host+":"+port+"/deleteByNameAndType?name="+d.name+"&type="+d.type, d.name);
+				d.sourceLinks.forEach(function(link){
+
+					deleteEntity("http://"+host+":"+port+"/deleteBySourceAndTargetAndProtocol?source="+link.source.name+"&target="+link.target.name+"&protocol="+link.protocol, link.source.name+" link with "+link.target.name+" through "+link.protocol);
+
+				});
+				d.targetLinks.forEach(function(link){
+					
+					deleteEntity("http://"+host+":"+port+"/deleteBySourceAndTargetAndProtocol?source="+link.source.name+"&target="+link.target.name+"&protocol="+link.protocol, link.source.name+" link with "+link.target.name+" through "+link.protocol);
+
+				});
+				
+			}
+			else
+				alert ("Back to the drawing board!")
+						
+        }
+		
+		function deleteEntity(_url, entityName)
+        {
+
+            $.ajax({
+                type: "POST",
+                url: _url,
+                dataType: "json",
+                contentType: 'application/json; charset=UTF-8',
+
+                success: function() {
+					
+                },
+                statusCode: {
+					200: function() {
+						alert(entityName+" successfully Deleted");
+						location.reload();
+					},
+                    409: function () {
+                        alert('Unable to delete');
+                    },
+
+                    400: function () {
+                        alert('bad request');
+                    }
+                }
+            });
+
+
+        }
+		
+    };
+
+});
+});
+
+
+
+</script>
+
+ </body>
