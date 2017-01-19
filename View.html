@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <meta content="utf-8" http-equiv="encoding">
+<meta http-equiv="Pragma" content="no-cache, no-store"> 
+    <meta http-equiv="Expires" content="-1"> 
+    <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+	<meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
 <title>View</title>
 <style>
 
@@ -229,7 +233,7 @@ $.ajax({
         function confirmDeleteLink(d){
 			d3.event.preventDefault();
         
-		   var answer = confirm ("Delete this link?")
+		   var answer = confirm ("Delete "+d.source.name+" link with "+d.target.name+" through"+d.protocol+" ?")
 			if (answer)
 			{
 				var url = "http://"+host+":"+port+"/deleteLinkBySourceAndTargetAndProtocol?source="+d.source.name+"&target="+d.target.name+"&protocol="+d.protocol;
@@ -245,7 +249,7 @@ $.ajax({
 		function confirmDeleteNode(d){
 			d3.event.preventDefault();
         
-		   var answer = confirm ("Delete this node?")
+		   var answer = confirm ("Delete "+d.name+"?")
 			if (answer)
 			{
 				deleteEntity ("http://"+host+":"+port+"/deleteNodeByNameAndType?name="+d.name+"&type="+d.type, d.name);
