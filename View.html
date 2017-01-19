@@ -232,7 +232,7 @@ $.ajax({
 		   var answer = confirm ("Delete this link?")
 			if (answer)
 			{
-				var url = "http://"+host+":"+port+"/deleteBySourceAndTargetAndProtocol?source="+d.source.name+"&target="+d.target.name+"&protocol="+d.protocol;
+				var url = "http://"+host+":"+port+"/deleteLinkBySourceAndTargetAndProtocol?source="+d.source.name+"&target="+d.target.name+"&protocol="+d.protocol;
 				deleteEntity (url, d.source.name+" link with "+d.target.name+" through"+d.protocol);
 				
 			}
@@ -248,15 +248,15 @@ $.ajax({
 		   var answer = confirm ("Delete this node?")
 			if (answer)
 			{
-				deleteEntity ("http://"+host+":"+port+"/deleteByNameAndType?name="+d.name+"&type="+d.type, d.name);
+				deleteEntity ("http://"+host+":"+port+"/deleteNodeByNameAndType?name="+d.name+"&type="+d.type, d.name);
 				d.sourceLinks.forEach(function(link){
 
-					deleteEntity("http://"+host+":"+port+"/deleteBySourceAndTargetAndProtocol?source="+link.source.name+"&target="+link.target.name+"&protocol="+link.protocol, link.source.name+" link with "+link.target.name+" through "+link.protocol);
+					deleteEntity("http://"+host+":"+port+"/deleteLinkBySourceAndTargetAndProtocol?source="+link.source.name+"&target="+link.target.name+"&protocol="+link.protocol, link.source.name+" link with "+link.target.name+" through "+link.protocol);
 
 				});
 				d.targetLinks.forEach(function(link){
 					
-					deleteEntity("http://"+host+":"+port+"/deleteBySourceAndTargetAndProtocol?source="+link.source.name+"&target="+link.target.name+"&protocol="+link.protocol, link.source.name+" link with "+link.target.name+" through "+link.protocol);
+					deleteEntity("http://"+host+":"+port+"/deleteLinkBySourceAndTargetAndProtocol?source="+link.source.name+"&target="+link.target.name+"&protocol="+link.protocol, link.source.name+" link with "+link.target.name+" through "+link.protocol);
 
 				});
 				
