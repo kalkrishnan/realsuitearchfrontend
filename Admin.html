@@ -117,13 +117,7 @@ var subscriptionEndpoint = "/arch";
 						}
 		}
 		
-		function deleteNodeOptions(value)
-		{
-						console.log('Deleting node: ' + value.name+": "+value.type);
-						deleteSelectOption("selectSourceNode", value.name);
-						deleteSelectOption("targetSourceNode", value.name);
-
-		}
+	
 		
 		function containsOption(element, value)
 		{
@@ -147,15 +141,7 @@ var subscriptionEndpoint = "/arch";
 			element.appendChild(node);
 		}
 		
-		function deleteSelectOption(elementName, value)
-		{
-			var element = document.getElementById(elementName);
-			var node = document.createElement('option');
-			for (var i=0; i<element.length; i++){
-				if (element.options[i].value == value )
-				element.remove(i);
-			}
-		}
+	
 		
 		function loadProtocol()
 		{
@@ -204,6 +190,26 @@ var subscriptionEndpoint = "/arch";
 				});
 		}
 		
+		function deleteNodeOptions(value)
+		{
+						console.log('Deleting node: ' + value.name+": "+value.type);
+						deleteSelectOption("selectSourceNode", value.name);
+						deleteSelectOption("targetSourceNode", value.name);
+
+		}
+		
+		function deleteSelectOption(elementName, value)
+		{
+			var element = document.getElementById(elementName);
+			var node = document.createElement('option');
+			for (var i=0; i<element.length; i++){
+				if (element.options[i].value == value )
+				element.remove(i);
+			}
+		}
+		
+		
+		//starts here
 		
 		loadNodes();
 		loadProtocol();
